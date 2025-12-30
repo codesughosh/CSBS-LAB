@@ -4,105 +4,117 @@ using namespace std;
 class DATE
 {
 private:
-    int dd, mm, yy;
+    int d, m, y;
+
+    bool isLeap(int y) const
+    {
+        return (y % 400 == 0 || (y % 4 == 0 && y % 100 != 0));
+    }
+
+    int monthDays(int m, int y) const
+    {
+        switch (m)
+        {
+        case 1: case 3: case 5: case 7:
+        case 8: case 10: case 12:
+            return 31;
+        case 4: case 6: case 9: case 11:
+            return 30;
+        case 2:
+            return isLeap(y) ? 29 : 28;
+        }
+        return 0;
+    }
+
+    long toDays() const
+    {
+        long days = d;
+
+        for (int i = 1; i < m; i++)
+            days += monthDays(i, y);
+
+        days += (y - 1) * 365;
+        days += (y - 1) / 4 - (y - 1) / 100 + (y - 1) / 400;
+
+        return days;
+    }
+
+    void fromDays(long total)
+    {
+        y = 1;
+        while (true)
+        {
+            int dy = isLeap(y) ? 366 : 365;
+            if (total > dy)
+            {
+                total -= dy;
+                y++;
+            }
+            else break;
+        }
+
+        m = 1;
+        while (true)
+        {
+            int dm = monthDays(m, y);
+            if (total > dm)
+            {
+                total -= dm;
+                m++;
+            }
+            else break;
+        }
+
+        d = total;
+    }
 
 public:
-    void read()
+    DATE() { d = 1; m = 1; y = 1; }
+
+    DATE(int dd, int mm, int yy)
     {
-        char ch;
-        cout << "Enter date (dd/mm/yy): ";
-        cin >> dd >> ch >> mm >> ch >> yy;
+        d = dd; m = mm; y = yy;
     }
 
-    // Convert date to total days
-    int toDays() const
+    int operator-(const DATE &o) const
     {
-        return yy * 360 + mm * 30 + dd;
+        return toDays() - o.toDays();
     }
 
-    // Operator - (difference between two dates)
-    int operator-(DATE d)
+    DATE operator+(int days) const
     {
-        return this->toDays() - d.toDays();
+        DATE t;
+        t.fromDays(toDays() + days);
+        return t;
     }
 
-    // Operator + (add days to date)
-    DATE operator+(int days)
+    friend ostream &operator<<(ostream &out, const DATE &dt)
     {
-        DATE temp;
-        int total = this->toDays() + days;
-
-        temp.yy = total / 360;
-        total = total % 360;
-
-        temp.mm = total / 30;
-        temp.dd = total % 30;
-
-        if (temp.dd == 0)
-        {
-            temp.dd = 30;
-            temp.mm--;
-        }
-        if (temp.mm == 0)
-        {
-            temp.mm = 12;
-            temp.yy--;
-        }
-
-        return temp;
-    }
-
-    // Operator << for display
-    friend ostream &operator<<(ostream &out, DATE d)
-    {
-        out << d.dd << "/" << d.mm << "/" << d.yy;
+        out << dt.d << "/" << dt.m << "/" << dt.y;
         return out;
     }
 };
 
 int main()
 {
-    DATE d1, d2;
-    int choice, no_of_days;
+    int d1, m1, y1, d2, m2, y2;
 
-    cout << "Enter first date:\n";
-    d1.read();
+    cout << "Enter first date (dd mm yyyy): ";
+    cin >> d1 >> m1 >> y1;
 
-    cout << "Enter second date:\n";
-    d2.read();
+    cout << "Enter second date (dd mm yyyy): ";
+    cin >> d2 >> m2 >> y2;
 
-    do
-    {
-        cout << "\n--- MENU ---\n";
-        cout << "1. Find number of days (d1 - d2)\n";
-        cout << "2. Add days to date (d1 + days)\n";
-        cout << "3. Exit\n";
-        cout << "Enter choice: ";
-        cin >> choice;
+    DATE date1(d1, m1, y1), date2(d2, m2, y2);
 
-        switch (choice)
-        {
-        case 1:
-            no_of_days = d1 - d2;
-            cout << "Number of days between dates: " << no_of_days << endl;
-            break;
+    cout << "Days difference: " << (date1 - date2) << endl;
 
-        case 2:
-            cout << "Enter number of days: ";
-            cin >> no_of_days;
-            d2 = d1 + no_of_days;
-            cout << "New date: " << d2 << endl;
-            break;
+    int n;
+    cout << "Enter days to add: ";
+    cin >> n;
 
-        case 3:
-            cout << "Exiting program.\n";
-            break;
-
-        default:
-            cout << "Invalid choice.\n";
-        }
-
-    } while (choice != 3);
+    DATE newDate = date1 + n;
+    cout << "New date: " << newDate << endl;
 
     return 0;
 }
