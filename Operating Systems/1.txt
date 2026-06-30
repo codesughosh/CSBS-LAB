@@ -15,3 +15,10 @@ echo "Division = $((a/b))"
 
 # Exit Status
 echo "Exit Status = $?"
+
+
+nano prog1.sh
+# Paste the code and save
+
+chmod +x prog1.sh
+./prog1.sh
