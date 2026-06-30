@@ -1,1 +1,17 @@
-k
+#!/bin/bash
+
+# Output
+echo "OS Lab Program"
+
+# Input
+echo "Enter two numbers:"
+read a b
+
+# Arithmetic Operations
+echo "Addition = $((a+b))"
+echo "Subtraction = $((a-b))"
+echo "Multiplication = $((a*b))"
+echo "Division = $((a/b))"
+
+# Exit Status
+echo "Exit Status = $?"
